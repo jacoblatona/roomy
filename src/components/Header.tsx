@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import { isLoginModalOpenAtom, isRoomModalOpenAtom } from "../atoms/modals";
 import { useSession } from "next-auth/react";
 import UserDropdown from "./UserDropdown";
+import Link from "next/link";
 
 const Header: React.FC = () => {
   const [open, setOpen] = useAtom(isLoginModalOpenAtom);
@@ -10,7 +11,9 @@ const Header: React.FC = () => {
   return (
     <header className="py-6">
       <nav className="container mx-auto flex items-center justify-between">
-        <img src="/images/logo.png" alt="Logo" className="w-14" />
+        <Link href="/">
+          <img src="/images/logo.png" alt="Logo" className="w-14" />
+        </Link>
         <div className="flex items-center gap-8 font-medium">
           {sessionData ? (
             <UserDropdown

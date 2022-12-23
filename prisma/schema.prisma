@@ -42,14 +42,17 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  rooms         Room[]
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  sessions       Session[]
+  questions      Question[]
+  createdRooms   Room[]
+  rooms          Participant[]
+  ratings          Rating[]
 }
 
 model VerificationToken {
@@ -62,11 +65,49 @@ model VerificationToken {
 
 model Room {
   id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creatorId    String
+  creator      User     @relation(fields: [creatorId], references: [id])
   name         String
-  topic        String 
   description  String
+  participants Participant[]
+  questions    Question[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([name])
+}
+
+model Participant {
+  id           String   @id @default(cuid())
+  name         String
+  description  String
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  roomId       String
+  room         Room     @relation(fields: [roomId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Question {
+  id           String   @id @default(cuid())
+  question     String
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  roomId       String
+  room         Room     @relation(fields: [roomId], references: [id])
+  ratings      Rating[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Rating {
+  id           String   @id @default(cuid())
+  type         String
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  questionId   String
+  question     Question @relation(fields: [questionId], references: [id])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

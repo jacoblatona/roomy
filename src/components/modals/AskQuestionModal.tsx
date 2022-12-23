@@ -1,15 +1,22 @@
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
-import { isRoomModalOpenAtom } from "../../atoms/modals";
+import { isAskQuestionModalOpenAtom } from "../../atoms/modals";
 import { trpc } from "../../utils/trpc";
-import { CreateRoomInput, createRoomSchema } from "../../schemas/room.schema";
+import {
+  CreateQuestionInput,
+  createQuestionSchema,
+} from "../../schemas/question.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 
-const CreateRoomModal: React.FC = () => {
-  const [open, setOpen] = useAtom(isRoomModalOpenAtom);
+type Props = {
+  id: string;
+};
+
+const AskQuestionModal: React.FC<Props> = ({ id }: Props) => {
+  const [open, setOpen] = useAtom(isAskQuestionModalOpenAtom);
   const cancelButtonRef = useRef(null);
   const [processing, setProcessing] = useState<boolean>(false);
 
@@ -20,32 +27,34 @@ const CreateRoomModal: React.FC = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreateRoomInput>({
-    resolver: zodResolver(createRoomSchema),
+  } = useForm<CreateQuestionInput>({
+    resolver: zodResolver(createQuestionSchema),
   });
 
-  const { mutate, error } = trpc.room.createRoom.useMutation({
+  const { mutate, error } = trpc.question.createQuestion.useMutation({
     onError: (error) => {
       toast.error(error.message);
     },
     onSuccess: () => {
-      toast.success("Room created succesfully");
+      toast.success("Question posted succesfully");
       setOpen(false);
       reset({
-        name: "",
-        description: "",
+        question: "",
       });
 
-      utils.room.getAll.invalidate();
+      utils.room.getRoom.invalidate();
     },
     onSettled: () => {
       setProcessing(false);
     },
   });
 
-  const onSubmit = async (data: CreateRoomInput) => {
+  const onSubmit = async (data: CreateQuestionInput) => {
     setProcessing(true);
-    mutate(data);
+    mutate({
+      question: data.question,
+      roomId: id,
+    });
   };
 
   return (
@@ -81,46 +90,27 @@ const CreateRoomModal: React.FC = () => {
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-slate-800 px-4 pt-5 pb-4 text-left transition-all sm:my-8 sm:w-full sm:max-w-md sm:p-8">
                 <h1 className="text-lg font-medium tracking-tight text-white sm:text-center">
-                  Create Room
+                  Ask Question
                 </h1>
                 <form onSubmit={handleSubmit(onSubmit)}>
+                  <input type="hidden" value={id} {...register("roomId")} />
                   <div className="mt-5 flex flex-col space-y-5">
                     <div>
                       <label
-                        htmlFor="name"
+                        htmlFor="question"
                         className="block text-sm font-medium text-white"
                       >
-                        Name
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="type"
-                          id="name"
-                          className="block w-full rounded-md border-0 bg-white/10 p-3 text-white focus:outline-none focus:ring-0 sm:text-sm"
-                          {...register("name")}
-                        />
-                        <p className="text-sm text-red-500">
-                          {errors.name?.message}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="description"
-                        className="block text-sm font-medium text-white"
-                      >
-                        Description
+                        Question
                       </label>
                       <div className="mt-1">
                         <textarea
-                          id="description"
+                          id="question"
                           className="block w-full rounded-md border-0 bg-white/10 p-3 text-white focus:outline-none focus:ring-0 sm:text-sm"
                           rows={4}
-                          {...register("description")}
+                          {...register("question")}
                         ></textarea>
                         <p className="text-sm text-red-500">
-                          {errors.description?.message}
+                          {errors.question?.message}
                         </p>
                       </div>
                     </div>
@@ -128,7 +118,7 @@ const CreateRoomModal: React.FC = () => {
                       type="submit"
                       className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                      {processing ? "Processing..." : "Create Room"}
+                      {processing ? "Processing..." : "Submit Question"}
                     </button>
                   </div>
                 </form>
@@ -141,4 +131,4 @@ const CreateRoomModal: React.FC = () => {
   );
 };
 
-export default CreateRoomModal;
+export default AskQuestionModal;
