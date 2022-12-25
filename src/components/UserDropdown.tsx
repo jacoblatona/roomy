@@ -13,7 +13,7 @@ const UserDropdown: React.FC<Props> = ({ image, name }: Props) => {
       <div>
         <Menu.Button className="inline-flex w-full items-center justify-center gap-3 rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-0">
           <img src={image} alt="User Avatar" className="h-8 w-8 rounded-full" />
-          <span className="text-medium text-md cursor-pointer text-white">
+          <span className="text-medium text-md hidden cursor-pointer text-white md:inline-block">
             {name}
           </span>
         </Menu.Button>
@@ -30,11 +30,6 @@ const UserDropdown: React.FC<Props> = ({ image, name }: Props) => {
       >
         <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-slate-700 ring-opacity-5 focus:outline-none">
           <div className="py-1">
-            <Menu.Item>
-              <a href="#" className="block px-4 py-2 text-sm text-white">
-                Account settings
-              </a>
-            </Menu.Item>
             <Menu.Item>
               <span
                 onClick={() => signOut()}

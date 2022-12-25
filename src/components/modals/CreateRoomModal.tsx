@@ -3,15 +3,30 @@ import { Dialog, Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
 import { isRoomModalOpenAtom } from "../../atoms/modals";
 import { trpc } from "../../utils/trpc";
-import { CreateRoomInput, createRoomSchema } from "../../schemas/room.schema";
+import {
+  type CreateRoomInput,
+  createRoomSchema,
+} from "../../schemas/room.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 
+const tagsArray = [
+  "Technology",
+  "Politics",
+  "Sports",
+  "Science",
+  "Academics",
+  "Entertainment",
+  "Gaming",
+];
+
 const CreateRoomModal: React.FC = () => {
   const [open, setOpen] = useAtom(isRoomModalOpenAtom);
   const cancelButtonRef = useRef(null);
+
   const [processing, setProcessing] = useState<boolean>(false);
+  const [tags, setTags] = useState<Array<string>>([]);
 
   const utils = trpc.useContext();
 
@@ -31,6 +46,7 @@ const CreateRoomModal: React.FC = () => {
     onSuccess: () => {
       toast.success("Room created succesfully");
       setOpen(false);
+      setTags([]);
       reset({
         name: "",
         description: "",
@@ -43,9 +59,30 @@ const CreateRoomModal: React.FC = () => {
     },
   });
 
+  const handleAddTag = (tag: string) => {
+    let newTags = tags;
+    if (tags.includes(tag)) {
+      // remove
+      newTags = tags.filter((item) => item !== tag);
+    } else {
+      if (tags.length < 3) {
+        newTags = [...tags, tag];
+      }
+    }
+
+    setTags(newTags);
+    reset({
+      tags: newTags,
+    });
+  };
+
   const onSubmit = async (data: CreateRoomInput) => {
     setProcessing(true);
-    mutate(data);
+    mutate({
+      name: data.name,
+      description: data.description,
+      tags: data.tags,
+    });
   };
 
   return (
@@ -79,10 +116,11 @@ const CreateRoomModal: React.FC = () => {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-slate-800 px-4 pt-5 pb-4 text-left transition-all sm:my-8 sm:w-full sm:max-w-md sm:p-8">
+              <Dialog.Panel className="relative w-full transform overflow-hidden rounded-lg bg-slate-800 px-4 pt-5 pb-4 text-left transition-all sm:my-8 sm:w-full sm:max-w-md sm:p-8">
                 <h1 className="text-lg font-medium tracking-tight text-white sm:text-center">
                   Create Room
                 </h1>
+
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="mt-5 flex flex-col space-y-5">
                     <div>
@@ -96,7 +134,7 @@ const CreateRoomModal: React.FC = () => {
                         <input
                           type="type"
                           id="name"
-                          className="block w-full rounded-md border-0 bg-white/10 p-3 text-white focus:outline-none focus:ring-0 sm:text-sm"
+                          className="block w-full rounded-md border-0 bg-slate-700 p-3 text-white focus:outline-none focus:ring-0 sm:text-sm"
                           {...register("name")}
                         />
                         <p className="text-sm text-red-500">
@@ -115,12 +153,39 @@ const CreateRoomModal: React.FC = () => {
                       <div className="mt-1">
                         <textarea
                           id="description"
-                          className="block w-full rounded-md border-0 bg-white/10 p-3 text-white focus:outline-none focus:ring-0 sm:text-sm"
+                          className="block w-full rounded-md border-0 bg-slate-700 p-3 text-white focus:outline-none focus:ring-0 sm:text-sm"
                           rows={4}
                           {...register("description")}
                         ></textarea>
                         <p className="text-sm text-red-500">
                           {errors.description?.message}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="description"
+                        className="block text-sm font-medium text-white"
+                      >
+                        Tags
+                      </label>
+                      <p className="text-xs text-white/50">
+                        You can select up to 3 tags.
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-3">
+                        {tagsArray.map((tag) => (
+                          <div
+                            key={tag}
+                            onClick={() => handleAddTag(tag)}
+                            className={`cursor-pointer rounded-full bg-${
+                              tags.includes(tag) ? "indigo-600" : "slate-700"
+                            } px-4 py-1 text-sm font-medium text-white`}
+                          >
+                            {tag}
+                          </div>
+                        ))}
+                        <p className="text-sm text-red-500">
+                          {errors.tags?.message}
                         </p>
                       </div>
                     </div>

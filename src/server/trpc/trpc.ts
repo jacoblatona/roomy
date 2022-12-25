@@ -33,6 +33,8 @@ const isAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
+/*
+
 /**
  * Protected procedure
  **/

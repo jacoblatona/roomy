@@ -1,15 +1,10 @@
-import { Fragment, MutableRefObject, useRef, useState } from "react";
+import { Fragment, useRef } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
 import { isLoginModalOpenAtom } from "../../atoms/modals";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faDiscord,
-  faTwitch,
-  faTwitter,
-  faGithub,
-} from "@fortawesome/free-brands-svg-icons";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faDiscord, faGithub } from "@fortawesome/free-brands-svg-icons";
+import { type IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { signIn } from "next-auth/react";
 
 interface AuthOption {
@@ -19,8 +14,6 @@ interface AuthOption {
 
 const AuthOptions = [
   { name: "Discord", icon: faDiscord },
-  { name: "Twitch", icon: faTwitch },
-  { name: "Twitter", icon: faTwitter },
   { name: "Github", icon: faGithub },
 ];
 
@@ -58,7 +51,7 @@ const LoginModal: React.FC = () => {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-slate-800 px-4 pt-5 pb-4 text-left transition-all sm:my-8 sm:w-full sm:max-w-md sm:p-8">
+              <Dialog.Panel className="relative w-full transform overflow-hidden rounded-lg bg-slate-800 px-4 pt-5 pb-4 text-left transition-all sm:my-8 sm:w-full sm:max-w-md sm:p-8">
                 <h1 className="text-md font-medium tracking-tight text-white sm:text-center">
                   Sign in with
                 </h1>

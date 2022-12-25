@@ -1,24 +1,45 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
-import { isAskQuestionModalOpenAtom } from "../../atoms/modals";
+import { isAnswerQuestionModalOpenAtom } from "../../atoms/modals";
 import { trpc } from "../../utils/trpc";
-import {
-  CreateQuestionInput,
-  createQuestionSchema,
-} from "../../schemas/question.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
+import {
+  type AnswerQuestionInput,
+  answerQuestionSchema,
+} from "../../schemas/question.schema";
+import { selectedQuestionAtom } from "../../atoms/question";
 
 type Props = {
   id: string;
+  question: string;
+  author: string;
 };
 
-const AskQuestionModal: React.FC<Props> = ({ id }: Props) => {
-  const [open, setOpen] = useAtom(isAskQuestionModalOpenAtom);
+const AnswerQuestionModal: React.FC<Props> = ({
+  id,
+  question,
+  author,
+}: Props) => {
+  const [open, setOpen] = useAtom(isAnswerQuestionModalOpenAtom);
   const cancelButtonRef = useRef(null);
   const [processing, setProcessing] = useState<boolean>(false);
+  const [selectedQuestion] = useAtom(selectedQuestionAtom);
+
+  useEffect(() => {
+    reset({
+      questionId: selectedQuestion.id,
+    });
+
+    return () => {
+      reset({
+        questionId: undefined,
+        answer: undefined,
+      });
+    };
+  }, [selectedQuestion]);
 
   const utils = trpc.useContext();
 
@@ -27,19 +48,19 @@ const AskQuestionModal: React.FC<Props> = ({ id }: Props) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreateQuestionInput>({
-    resolver: zodResolver(createQuestionSchema),
+  } = useForm<AnswerQuestionInput>({
+    resolver: zodResolver(answerQuestionSchema),
   });
 
-  const { mutate, error } = trpc.question.createQuestion.useMutation({
+  const { mutate, error } = trpc.question.answerQuestion.useMutation({
     onError: (error) => {
       toast.error(error.message);
     },
     onSuccess: () => {
-      toast.success("Question posted succesfully");
+      toast.success("Question answered successfully");
       setOpen(false);
       reset({
-        question: "",
+        answer: "",
       });
 
       utils.room.getRoom.invalidate();
@@ -49,12 +70,9 @@ const AskQuestionModal: React.FC<Props> = ({ id }: Props) => {
     },
   });
 
-  const onSubmit = async (data: CreateQuestionInput) => {
+  const onSubmit = async (data: AnswerQuestionInput) => {
     setProcessing(true);
-    mutate({
-      question: data.question,
-      roomId: id,
-    });
+    mutate(data);
   };
 
   return (
@@ -88,29 +106,47 @@ const AskQuestionModal: React.FC<Props> = ({ id }: Props) => {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative w-full transform overflow-hidden rounded-lg bg-slate-800 px-4 pt-5 pb-4 text-left transition-all sm:my-8 sm:w-full sm:max-w-md sm:p-8">
+              <Dialog.Panel className="relative w-full transform overflow-hidden rounded-lg bg-slate-800 px-4 pt-5 pb-4 text-left transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-8">
                 <h1 className="text-lg font-medium tracking-tight text-white sm:text-center">
-                  Ask Question
+                  Answer Question
                 </h1>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                  <input type="hidden" value={id} {...register("roomId")} />
+                  <input type="hidden" value={id} {...register("questionId")} />
                   <div className="mt-5 flex flex-col space-y-5">
                     <div>
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="description"
+                          className="block text-sm font-medium text-white"
+                        >
+                          Question
+                        </label>
+                        <span className="block text-sm text-white/50">
+                          Posted by /{author}
+                        </span>
+                      </div>
+                      <div className="mt-1">
+                        <div className="w-full rounded-md bg-slate-700 p-3 text-white">
+                          {question}
+                        </div>
+                      </div>
+                    </div>
+                    <div>
                       <label
-                        htmlFor="question"
+                        htmlFor="description"
                         className="block text-sm font-medium text-white"
                       >
-                        Question
+                        Answer
                       </label>
                       <div className="mt-1">
                         <textarea
-                          id="question"
+                          id="description"
                           className="block w-full rounded-md border-0 bg-slate-700 p-3 text-white focus:outline-none focus:ring-0 sm:text-sm"
                           rows={4}
-                          {...register("question")}
+                          {...register("answer")}
                         ></textarea>
                         <p className="text-sm text-red-500">
-                          {errors.question?.message}
+                          {errors.answer?.message}
                         </p>
                       </div>
                     </div>
@@ -118,7 +154,7 @@ const AskQuestionModal: React.FC<Props> = ({ id }: Props) => {
                       type="submit"
                       className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                      {processing ? "Processing..." : "Submit Question"}
+                      {processing ? "Processing..." : "Submit Answer"}
                     </button>
                   </div>
                 </form>
@@ -131,4 +167,4 @@ const AskQuestionModal: React.FC<Props> = ({ id }: Props) => {
   );
 };
 
-export default AskQuestionModal;
+export default AnswerQuestionModal;

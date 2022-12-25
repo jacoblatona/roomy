@@ -10,4 +10,10 @@ export const createRatingSchema = z.object({
   questionId: z.string(),
 });
 
+export const answerQuestionSchema = z.object({
+  answer: z.string().min(2),
+  questionId: z.string(),
+});
+
 export type CreateQuestionInput = z.TypeOf<typeof createQuestionSchema>;
+export type AnswerQuestionInput = z.TypeOf<typeof answerQuestionSchema>;

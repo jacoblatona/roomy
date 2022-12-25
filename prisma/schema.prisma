@@ -16,19 +16,20 @@ datasource db {
 
 // Necessary for Next auth
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? // @db.Text
-  access_token      String? // @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? // @db.Text
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                        String  @id @default(cuid())
+  userId                    String
+  type                      String
+  provider                  String
+  providerAccountId         String
+  refresh_token             String? // @db.Text
+  refresh_token_expires_in  String? // @db.Text
+  access_token              String? // @db.Text
+  expires_at                Int?
+  token_type                String?
+  scope                     String?
+  id_token                  String? // @db.Text
+  session_state             String?
+  user                      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -67,10 +68,11 @@ model Room {
   id           String   @id @default(cuid())
   creatorId    String
   creator      User     @relation(fields: [creatorId], references: [id])
-  name         String
-  description  String
+  name         String 
+  description  String  // @db.Text
   participants Participant[]
   questions    Question[]
+  tags         String? // change to JSON on mysql
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -79,8 +81,6 @@ model Room {
 
 model Participant {
   id           String   @id @default(cuid())
-  name         String
-  description  String
   userId       String
   user         User     @relation(fields: [userId], references: [id])
   roomId       String
@@ -91,12 +91,13 @@ model Participant {
 
 model Question {
   id           String   @id @default(cuid())
-  question     String
+  question     String  // @db.Text
   userId       String
   user         User     @relation(fields: [userId], references: [id])
   roomId       String
   room         Room     @relation(fields: [roomId], references: [id])
   ratings      Rating[]
+  answer       Answer?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -110,4 +111,15 @@ model Rating {
   question     Question @relation(fields: [questionId], references: [id])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model Answer {
+  id           String   @id @default(cuid())
+  answer       String  // @db.Text
+  questionId   String
+  question     Question @relation(fields: [questionId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([questionId])
 }
