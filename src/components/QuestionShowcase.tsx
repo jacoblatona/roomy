@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { type IQuestion } from "../types";
 import { trpc } from "../utils/trpc";
-import { isAnswerQuestionModalOpenAtom } from "../atoms/modals";
 import { useAtom } from "jotai";
-import { selectedQuestionAtom } from "../atoms/question";
+import { selectedQuestionAtom, isAnswerQuestionModalOpenAtom } from "../atoms";
 
 type QuestionProps = {
   question: IQuestion;

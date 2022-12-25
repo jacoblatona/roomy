@@ -1,7 +1,10 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
-import { isAnswerQuestionModalOpenAtom } from "../../atoms/modals";
+import {
+  isAnswerQuestionModalOpenAtom,
+  selectedQuestionAtom,
+} from "../../atoms";
 import { trpc } from "../../utils/trpc";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +13,6 @@ import {
   type AnswerQuestionInput,
   answerQuestionSchema,
 } from "../../schemas/question.schema";
-import { selectedQuestionAtom } from "../../atoms/question";
 
 type Props = {
   id: string;

@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { isLoginModalOpenAtom, isRoomModalOpenAtom } from "../atoms/modals";
+import { isLoginModalOpenAtom, isRoomModalOpenAtom } from "../atoms";
 import { useSession } from "next-auth/react";
 import UserDropdown from "./UserDropdown";
 import Link from "next/link";

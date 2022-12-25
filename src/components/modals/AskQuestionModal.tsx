@@ -1,7 +1,7 @@
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
-import { isAskQuestionModalOpenAtom } from "../../atoms/modals";
+import { isAskQuestionModalOpenAtom } from "../../atoms";
 import { trpc } from "../../utils/trpc";
 import {
   CreateQuestionInput,

@@ -1,7 +1,7 @@
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
-import { isRoomModalOpenAtom } from "../../atoms/modals";
+import { isRoomModalOpenAtom } from "../../atoms";
 import { trpc } from "../../utils/trpc";
 import {
   type CreateRoomInput,

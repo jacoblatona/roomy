@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { isRoomModalOpenAtom } from "../atoms/modals";
+import { isRoomModalOpenAtom } from "../atoms";
 import { useAtom } from "jotai";
 
 const Hero: React.FC = () => {

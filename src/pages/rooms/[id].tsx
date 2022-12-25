@@ -8,13 +8,13 @@ import { useAtom } from "jotai";
 import {
   isAskQuestionModalOpenAtom,
   isLoginModalOpenAtom,
-} from "../../atoms/modals";
+  selectedQuestionAtom,
+} from "../../atoms";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 import { ParticipantShowcase } from "../../components/ParticipantShowcase";
 import { QuestionShowcase } from "../../components/QuestionShowcase";
 import AnswerQuestionModal from "../../components/modals/AnswerQuestionModal";
-import { selectedQuestionAtom } from "../../atoms/question";
 import { useState } from "react";
 
 const Room: NextPage = () => {

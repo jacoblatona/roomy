@@ -1,7 +1,7 @@
 import { Fragment, useRef } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
-import { isLoginModalOpenAtom } from "../../atoms/modals";
+import { isLoginModalOpenAtom } from "../../atoms";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord, faGithub } from "@fortawesome/free-brands-svg-icons";
 import { type IconDefinition } from "@fortawesome/fontawesome-svg-core";
